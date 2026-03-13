@@ -5,11 +5,10 @@ const mongoose = require('mongoose');
 const app = express();
 const port = 3001;
 
-// 连接数据库（需要安装mongoose）
-mongoose.connect('mongodb://localhost:27017/emotion-diary', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+// 连接数据库
+mongoose.connect('mongodb://localhost:27017/emotion-diary')
+  .then(() => console.log('MongoDB 连接成功'))
+  .catch(err => console.error('MongoDB 连接失败:', err));
 
 app.use(cors());
 app.use(express.json());
