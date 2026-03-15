@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的情绪日记</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .header h2 {
+            color: #333;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+
+        .editor {
+            margin-bottom: 30px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            resize: none;
+        }
+        .diary-list h3 {
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .diary-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+        .diary-item .time {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .diary-item .content {
+            color: #333;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🖋️ 我的情绪日记</h2>
+            <button class="btn-danger" onclick="logout()">退出登录</button>
+        </div>
+
+        <!-- 写日记区域 -->
+        <div class="editor">
+            <textarea id="diaryContent" placeholder="✨ 今天的心情如何？记录下来吧..."></textarea>
+            <button class="btn-primary" onclick="saveDiary()">💾 保存日记</button>
+        </div>
+
+        <!-- 历史日记列表 -->
+        <div class="diary-list">
+            <h3>📜 历史记录</h3>
+            <div id="diaryList"></div>
+        </div>
+    </div>
+
+    <script>
+        // 获取 Token
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('⚠️ 请先登录！');
+            window.location.href = 'index.html';
+        }
+
+        // 保存日记
+        function saveDiary() {
+            const content = document.getElementById('diaryContent').value.trim();
+            if (!content) {
+                alert('⚠️ 请输入日记内容！');
+                return;
+            }
+
+            fetch('http://localhost:3001/api/diaries', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    title: '我的日记',
+                    content: content,
+                    mood: '开心'
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('网络错误');
+                return res.json();
+            })
+            .then(data => {
+                alert('✅ 日记保存成功！');
+                document.getElementById('diaryContent').value = '';
+                loadDiaries(); // 刷新列表
+            })
+            .catch(err => {
+                console.error(err);
+                alert('❌ 保存失败，请检查后端服务');
+            });
+        }
+
+        // 加载历史日记
+        function loadDiaries() {
+            fetch('http://localhost:3001/api/diaries', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('diaryList');
+                list.innerHTML = '';
+                
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="color: #999; text-align: center;">暂无日记记录</p>';
+                    return;
+                }
+
+                data.forEach(diary => {
+                    const item = document.createElement('div');
+                    item.className = 'diary-item';
+                    item.innerHTML = `
+                        <div class="time">📅 ${new Date(diary.createdAt).toLocaleString()}</div>
+                        <div class="content">${diary.content}</div>
+                    `;
+                    list.appendChild(item);
+                });
+            })
+            .catch(err => console.error(err));
+        }
+
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userInfo');
+            window.location.href = 'index.html';
+        }
+
+        // 页面加载即获取日记
+        loadDiaries();
+    </script>
+</body>
+</html>

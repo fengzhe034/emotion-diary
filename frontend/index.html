@@ -2,33 +2,93 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>情绪日记 - 登录/注册</title>
     <style>
-        .container { max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .tab { display: flex; margin-bottom: 20px; }
-        .tab-item { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-bottom: 2px solid transparent; }
-        .tab-item.active { border-bottom: 2px solid #007bff; color: #007bff; }
-        .form { display: none; }
-        .form.active { display: block; }
-        #message { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
-        .success { background: #d4edda; color: #155724; display: block; }
-        .error { background: #f8d7da; color: #721c24; display: block; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .tab {
+            padding: 0.8rem 1.2rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #666;
+        }
+        .tab.active {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .form-content {
+            display: none;
+        }
+        .form-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="tab">
-            <div class="tab-item active" onclick="switchTab('register')">注册</div>
-            <div class="tab-item" onclick="switchTab('login')">登录</div>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('register')">注册</button>
+            <button class="tab" onclick="switchTab('login')">登录</button>
         </div>
 
         <!-- 注册表单 -->
-        <div class="form active" id="registerForm">
+        <div id="registerForm" class="form-content active">
             <div class="form-group">
                 <label>用户名</label>
                 <input type="text" id="regUsername" placeholder="请输入用户名">
@@ -45,7 +105,7 @@
         </div>
 
         <!-- 登录表单 -->
-        <div class="form" id="loginForm">
+        <div id="loginForm" class="form-content">
             <div class="form-group">
                 <label>邮箱</label>
                 <input type="email" id="loginEmail" placeholder="请输入邮箱">
@@ -56,130 +116,81 @@
             </div>
             <button onclick="login()">登录</button>
         </div>
-
-        <!-- 提示消息 -->
-        <div id="message"></div>
     </div>
 
     <script>
-        // 后端接口基础地址（和你的服务端口保持一致）
-        const BASE_URL = 'http://localhost:3001/api';
-
-        // 切换标签页
+        // 切换标签
         function switchTab(type) {
-            // 切换tab样式
-            document.querySelectorAll('.tab-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.innerText === (type === 'register' ? '注册' : '登录')) {
-                    item.classList.add('active');
-                }
-            });
-            // 切换表单显示
-            document.getElementById('registerForm').classList.toggle('active', type === 'register');
-            document.getElementById('loginForm').classList.toggle('active', type === 'login');
-            // 清空提示
-            document.getElementById('message').className = '';
-            document.getElementById('message').innerText = '';
-        }
-
-        // 显示提示消息
-        function showMessage(text, isSuccess) {
-            const msg = document.getElementById('message');
-            msg.innerText = text;
-            msg.className = isSuccess ? 'success' : 'error';
+            const registerForm = document.getElementById('registerForm');
+            const loginForm = document.getElementById('loginForm');
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (type === 'register') {
+                registerForm.classList.add('active');
+                loginForm.classList.remove('active');
+            } else {
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+            }
         }
 
         // 注册功能
-        async function register() {
-            const username = document.getElementById('regUsername').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
-            const password = document.getElementById('regPassword').value.trim();
+        function register() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
 
-            // 简单校验
-            if (!username || !email || !password) {
-                showMessage('请填写所有必填项！', false);
-                return;
-            }
-
-            try {
-                // 调用后端注册接口
-                const response = await fetch(`${BASE_URL}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // 注册成功：保存token到本地存储
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify({
-                        id: data._id,
-                        username: data.username,
-                        email: data.email
-                    }));
-                    showMessage(`注册成功！欢迎 ${username}`, true);
-                    // 自动切换到登录页
-                    setTimeout(() => switchTab('login'), 2000);
-                } else {
-                    showMessage(data.msg || '注册失败', false);
-                }
-            } catch (error) {
-                showMessage('网络错误，请检查后端服务是否启动', false);
-                console.error('注册失败：', error);
-            }
+            fetch('http://localhost:3001/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message || '注册成功！');
+                switchTab('login');
+            })
+            .catch(err => {
+                console.error(err);
+                alert('注册失败，请检查后端服务');
+            });
         }
 
         // 登录功能
-        async function login() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
 
-            // 简单校验
-            if (!email || !password) {
-                showMessage('请填写邮箱和密码！', false);
-                return;
-            }
-
-            try {
-                // 调用后端登录接口
-                const response = await fetch(`${BASE_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // 登录成功：保存token到本地存储
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify({
-                        id: data._id,
-                        username: data.username,
-                        email: data.email
-                    }));
-                    showMessage(`登录成功！欢迎 ${data.username}`, true);
-                    // 可以跳转到首页
-                    // window.location.href = 'home.html';
-                } else {
-                    showMessage(data.msg || '登录失败，邮箱或密码错误', false);
+            fetch('http://localhost:3001/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message && data.message.includes('错误')) {
+                    alert('登录失败：' + data.message);
+                    return;
                 }
-            } catch (error) {
-                showMessage('网络错误，请检查后端服务是否启动', false);
-                console.error('登录失败：', error);
-            }
+                alert(data.message || '登录成功！');
+                // 保存 token 和用户信息
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userInfo', JSON.stringify({
+                    _id: data._id,
+                    username: data.username,
+                    email: data.email
+                }));
+                // ✅ 跳转到日记主页
+                window.location.href = 'diary.html';
+            })
+            .catch(err => {
+                console.error(err);
+                alert('登录失败，请检查账号密码或后端服务');
+            });
         }
-
-        // 页面加载时检查是否已登录
-        window.onload = function() {
-            const token = localStorage.getItem('token');
-            if (token) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                showMessage(`你已登录：${user.username}`, true);
-            }
-        };
     </script>
 </body>
 </html>
