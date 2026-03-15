@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // frontend/src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -26,22 +25,4 @@ function App() {
 }
 
 export default App;
-=======
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
-// 把里面的内容改成：
-function App() {
-  return (
-    <div>
-      <h1>情绪日记项目</h1>
-      <p>我是前端组：[Djzy]</p>
-      <p>项目已成功运行！</p>
-    </div>
-  )
-}
-
-export default App
->>>>>>> f12fe337ef1200e36727eb0e174faf5a8e552401

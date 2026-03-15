@@ -1,18 +1,6 @@
 {
   "name": "backend",
   "version": "1.0.0",
-<<<<<<< HEAD
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "mongoose": "^9.3.0"
-  }
-}
-=======
   "description": "情绪日记后端",
   "main": "server.js",
   "scripts": {
@@ -31,4 +19,4 @@
     "nodemon": "^3.0.1"
   }
 }
->>>>>>> f12fe337ef1200e36727eb0e174faf5a8e552401
+
