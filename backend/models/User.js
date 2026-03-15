@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-// models/User.js
-const mongoose = require('mongoose');
-
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  // 添加其他字段如email等
-});
-
-=======
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -49,5 +38,4 @@ userSchema.methods.comparePassword = async function(enteredPassword) {
 };
 
 // 导出模型
->>>>>>> f12fe337ef1200e36727eb0e174faf5a8e552401
 module.exports = mongoose.model('User', userSchema);
